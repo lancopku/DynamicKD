@@ -359,7 +359,7 @@ def main():
         use_auth_token=True if model_args.use_auth_token else None,
     )
 
-    model = ActiveObjectiveKDForSequenceClassification.from_pretrained(
+    model = DynamicObjectiveKDForSequenceClassification.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
         config=config,

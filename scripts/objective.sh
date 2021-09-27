@@ -1,4 +1,4 @@
-GPU=0
+GPU=2
 TEACHER_MODEL_PATH=/path/to/trained_teacher
 SL=6 # student layer number
 EPOCH=3
@@ -6,13 +6,14 @@ LR=2e-5
 KLa=1.0
 KL_ALPHA=1.0
 CE_ALPHA=1.0
+MODEL=bert-base
 for RALPHA in 1 # rte # 4
 do
 for STRGY in 'uncertainty' # none
 do
-for TASK_NAME in rte #
+for TASK_NAME in mrpc  #
 do
-for SEED in 1 # 2 3  #
+for SEED in 1 2 3  #
 do
 OUTPUT_DIR=./${TASK_NAME}-sl${SL}-msekd-seed${SEED}-epoch${EPOCH}-LR${LR}-KLALPHA${KL_ALPHA}-REP_ALPHA${RALPHA}-CE_ALPHA${CE_ALPHA}-STRGY${STRGY}
 

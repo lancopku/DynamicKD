@@ -16,7 +16,8 @@ pip install -r requirements.txt
 
 ## Train Teacher Model
 
-Using the provided `scripts/train_teacher.sh` script to train corresponding teacher model like BERT-base and BERT-large on the target datasets.
+Using the provided `scripts/train_teacher.sh` script to train corresponding teacher model like BERT-base and BERT-large on the target datasets. Note that the teacher and student performance on some small datasets may different from the reported numbers in the paper due to the randomness.
+
 
 ## Dynamic Teacher Adoption
 See `scripts/teacher.sh` and `dynamic_teacher.py` for details.

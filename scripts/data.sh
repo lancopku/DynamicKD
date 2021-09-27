@@ -1,4 +1,4 @@
-GPU=0
+GPU=2
 TEACHER_MODEL_PATH=/path/to/trained_teacher
 SL=6 # student num layer
 EPOCH=3
@@ -7,7 +7,7 @@ for STRGY in 'margin'   # data selection ['margin', 'lc', 'entropy', 'none']
 do
 for RATIO in 0.5 # selection ratio r
 do
-for TASK_NAME in  rte
+for TASK_NAME in mrpc 
 do
 for SEED in $(seq 1 3) #1234
 do

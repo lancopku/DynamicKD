@@ -359,7 +359,7 @@ def main():
         use_auth_token=True if model_args.use_auth_token else None,
     )
 
-    model = ActiveDataKDForSequenceClassification.from_pretrained(
+    model = DynamicDataKDForSequenceClassification.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
         config=config,
