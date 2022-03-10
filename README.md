@@ -1,6 +1,10 @@
 # Dynamic KD
 
-Code for EMNLP 2021 Main Conference Paper: Dynamic Knowledge Distillation for Pre-traiend Language Models, [pdf](https://aclanthology.org/2021.emnlp-main.31/)
+Code for EMNLP 2021 Main Conference Paper: 
+
+Dynamic Knowledge Distillation for Pre-traiend Language Models
+
+[pdf](https://aclanthology.org/2021.emnlp-main.31/)
 
 ## Code Example
 
