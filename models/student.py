@@ -173,7 +173,7 @@ class DynamicTeacherKDForSequenceClassification(BertForSequenceClassification):
                 else:
                     loss += self.kd_alpha * self.small_teacher_alpha * \
                             self.kl_loss(F.log_softmax(student_logits / self.temperature, dim=1),
-                                         F.softmax(small_logits, dim=-1)) * self.temperature ** 2
+                                         F.softmax(small_logits / self.temperature, dim=-1)) * self.temperature ** 2
 
             if large_logits is not None:
                 if not self.kl_kd:
@@ -182,7 +182,7 @@ class DynamicTeacherKDForSequenceClassification(BertForSequenceClassification):
                 else:
                     loss += self.kd_alpha * self.large_teacher_alpha * \
                             self.kl_loss(F.log_softmax(student_logits / self.temperature, dim=1),
-                                         F.softmax(large_logits, dim=-1)) * self.temperature ** 2
+                                         F.softmax(large_logits / self.temperature , dim=-1)) * self.temperature ** 2
 
         output = (student_logits,) + student_outputs[2:]
         return ((loss,) + output) if loss is not None else output
@@ -282,10 +282,10 @@ class UncertaintyTeacherKDForSequenceClassification(BertForSequenceClassificatio
                 if self.kl_kd:
                     large_kd_loss = self.kl_loss(
                         F.log_softmax(student_logits[large_kd_indices] / self.temperature, dim=1),
-                        F.softmax(large_logits[large_kd_indices], dim=-1)) * self.temperature ** 2
+                        F.softmax(large_logits[large_kd_indices] / self.temperature , dim=-1)) * self.temperature ** 2
                     small_kd_loss = self.kl_loss(
                         F.log_softmax(student_logits[small_kd_indices] / self.temperature, dim=1),
-                        F.softmax(small_logits[small_kd_indices], dim=-1)) * self.temperature ** 2
+                        F.softmax(small_logits[small_kd_indices] / self.temperature , dim=-1)) * self.temperature ** 2
                 else:
                     large_kd_loss = self.mse_loss(student_logits[large_kd_indices], large_logits[large_kd_indices])
                     small_kd_loss = self.mse_loss(student_logits[small_kd_indices], small_logits[small_kd_indices])
@@ -293,10 +293,10 @@ class UncertaintyTeacherKDForSequenceClassification(BertForSequenceClassificatio
                 if self.kl_kd:
                     large_kd_loss = self.kl_loss(
                         F.log_softmax(student_logits / self.temperature, dim=1),
-                        F.softmax(large_logits, dim=-1)) * self.temperature ** 2
+                        F.softmax(large_logits / self.temperature, dim=-1)) * self.temperature ** 2
                     small_kd_loss = self.kl_loss(
                         F.log_softmax(student_logits / self.temperature, dim=1),
-                        F.softmax(small_logits, dim=-1)) * self.temperature ** 2
+                        F.softmax(small_logits / self.temperature, dim=-1)) * self.temperature ** 2
                 else:
                     large_kd_loss = self.mse_loss(student_logits, large_logits)
                     small_kd_loss = self.mse_loss(student_logits, small_logits)
@@ -315,10 +315,10 @@ class UncertaintyTeacherKDForSequenceClassification(BertForSequenceClassificatio
                 if self.kl_kd:
                     large_kd_loss = self.temperature ** 2 * F.kl_div(
                         F.log_softmax(student_logits / self.temperature, dim=1),
-                        F.softmax(large_logits, dim=-1), reduction='none').sum(-1)  # bsz
+                        F.softmax(large_logits / self.temperature, dim=-1), reduction='none').sum(-1)  # bsz
                     small_kd_loss = self.temperature ** 2 * F.kl_div(
                         F.log_softmax(student_logits / self.temperature, dim=1),
-                        F.softmax(small_logits, dim=-1), reduction='none').sum(-1)  # bsz
+                        F.softmax(small_logits / self.temperature, dim=-1), reduction='none').sum(-1)  # bsz
                 else:
                     large_kd_loss = F.mse_loss(student_logits, large_logits, reduction='none').mean(dim=-1)  # bsz
                     small_kd_loss = F.mse_loss(student_logits, small_logits, reduction='none').mean(dim=-1)  # bsz
@@ -620,7 +620,7 @@ class DynamicObjectiveKDForSequenceClassification(BertForSequenceClassification)
                         # original reduction is batchmean,  sum over the logit dim, and mean over the batch level
                         kd_loss = self.temperature ** 2 * \
                                   F.kl_div(F.log_softmax(student_logits / self.temperature, dim=1),
-                                           F.softmax(teacher_logits, dim=-1), reduction='none').sum(dim=1)  # bsz
+                                           F.softmax(teacher_logits / self.temperature, dim=-1), reduction='none').sum(dim=1)  # bsz
                     # weight -> 1, model is most uncertain, thus need attention to the hidden loss
                     loss += self.kd_kl_alpha * torch.mean((1 - weight) * kd_loss,
                                                           dim=0) + self.kd_rep_alpha * torch.mean(weight * rep_loss,
@@ -635,7 +635,7 @@ class DynamicObjectiveKDForSequenceClassification(BertForSequenceClassification)
                     else:
                         kd_loss = self.temperature ** 2 * \
                                   F.kl_div(F.log_softmax(student_logits / self.temperature, dim=1),
-                                           F.softmax(teacher_logits, dim=-1), reduction='none').sum(dim=1)  # bsz
+                                           F.softmax(teacher_logits / self.temperature, dim=-1), reduction='none').sum(dim=1)  # bsz
                     # weight -> 1, model is most uncertain, thus need attention to the hidden loss
                     loss += self.kd_kl_alpha * torch.mean(weight * kd_loss, dim=0) + self.kd_rep_alpha * torch.mean(
                         (1 - weight) * rep_loss, dim=0)
@@ -646,7 +646,7 @@ class DynamicObjectiveKDForSequenceClassification(BertForSequenceClassification)
                                                 teacher_logits.view(-1))
                     else:
                         kd_loss = self.kl_loss(F.log_softmax(student_logits / self.temperature, dim=1),
-                                               F.softmax(teacher_logits, dim=-1)) * self.temperature ** 2
+                                               F.softmax(teacher_logits / self.temperature, dim=-1)) * self.temperature ** 2
                     loss += self.kd_kl_alpha * kd_loss
                     loss += self.kd_rep_alpha * rep_loss
 
